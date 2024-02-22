@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-const pokemon = require('pokemon')
+import pokemon from 'pokemon'
 
 const Quiz = () => {
   const [pokemonData, setPokemonData] = useState(null)
@@ -8,8 +8,6 @@ const Quiz = () => {
   const [correctAnswer, setCorrectAnswer] = useState('')
   const [hints, setHints] = useState([])
   const [mistakeCount, setMistakeCount] = useState(0)
-  const [pokemonImage, setPokemonImage] = useState(null)
-  const [showImage, setShowImage] = useState(false)
 
   useEffect(() => {
     fetchPokemonData()
@@ -17,7 +15,7 @@ const Quiz = () => {
 
   const fetchPokemonData = async () => {
     try {
-      const randomPokemonId = Math.floor(Math.random() * 905) + 1
+      const randomPokemonId = Math.floor(Math.random() * 898) + 1
       const response = await fetch(
         `https://pokeapi.co/api/v2/pokemon/${randomPokemonId}`
       )
@@ -28,11 +26,9 @@ const Quiz = () => {
       setPokemonData(data)
       setCorrectAnswer(pokemon.getName(data.id, 'ja'))
       setChoices(generateChoices(data.id))
-      setHints([`図鑑ナンバー: ${data.id}`])
+      setHints([`種族値: ${getStatsString(data.stats)}`])
       setMistakeCount(0)
       setFeedback('')
-      setPokemonImage(data.sprites.front_default)
-      setShowImage(false)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -41,7 +37,7 @@ const Quiz = () => {
   const generateChoices = correctAnswerId => {
     const choices = [correctAnswerId]
     while (choices.length < 4) {
-      const randomPokemonId = Math.floor(Math.random() * 905) + 1
+      const randomPokemonId = Math.floor(Math.random() * 898) + 1
       if (!choices.includes(randomPokemonId)) {
         choices.push(randomPokemonId)
       }
@@ -57,24 +53,28 @@ const Quiz = () => {
     return array
   }
 
+  const getStatsString = stats => {
+    const statNames = {
+      hp: 'H',
+      attack: 'A',
+      defense: 'B',
+      'special-attack': 'C',
+      'special-defense': 'D',
+      speed: 'S'
+    }
+    return stats
+      .map(stat => `${statNames[stat.stat.name]}=${stat.base_stat}`)
+      .join(', ')
+  }
+
   const handleSubmit = selectedAnswerId => {
     const selectedAnswer = pokemon.getName(selectedAnswerId, 'ja')
     if (selectedAnswer === correctAnswer) {
       setFeedback('正解！')
-      setShowImage(true)
     } else {
       setMistakeCount(mistakeCount + 1)
       if (mistakeCount === 0) {
-        setFeedback('不正解。')
-        setHints([
-          ...hints,
-          `タイプ: ${pokemonData.types.map(type => type.type.name).join(', ')}`
-        ])
-      } else if (mistakeCount === 1) {
-        setFeedback('不正解。')
-      } else {
-        setFeedback(`不正解。正解は「${correctAnswer}」でした。`)
-        setShowImage(true)
+        setFeedback(' 正解は「' + correctAnswer + '」エアプ乙wwwwwwww')
       }
     }
   }
@@ -86,9 +86,8 @@ const Quiz = () => {
   return (
     <div>
       <h1>ポケモンクイズ！</h1>
-      <p>このポケモンは何でしょう？(解答は３回まで)</p>
+      <p>このポケモンは何でしょう？</p>
       <p>{hints[0]}</p>
-      {mistakeCount > 0 && <p>{hints[1]}</p>}
       <ul>
         {choices.map((choice, index) => (
           <li key={index}>
@@ -99,12 +98,7 @@ const Quiz = () => {
         ))}
       </ul>
       <p>{feedback}</p>
-      <br />
-      {showImage && pokemonImage && (
-        <img src={pokemonImage} alt='ポケモン画像' />
-      )}
-      <br />
-      {feedback && <button onClick={handleNextQuestion}>次の問題へ</button>}
+      <button onClick={handleNextQuestion}>次の問題へ</button>
     </div>
   )
 }
