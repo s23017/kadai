@@ -8,6 +8,8 @@ const Quiz = () => {
   const [correctAnswer, setCorrectAnswer] = useState('')
   const [hints, setHints] = useState([])
   const [mistakeCount, setMistakeCount] = useState(0)
+  const [pokemonImage, setPokemonImage] = useState(null)
+  const [showImage, setShowImage] = useState(false)
 
   useEffect(() => {
     fetchPokemonData()
@@ -29,6 +31,8 @@ const Quiz = () => {
       setHints([`図鑑ナンバー: ${data.id}`])
       setMistakeCount(0)
       setFeedback('')
+      setPokemonImage(data.sprites.front_default)
+      setShowImage(false)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -57,6 +61,7 @@ const Quiz = () => {
     const selectedAnswer = pokemon.getName(selectedAnswerId, 'ja')
     if (selectedAnswer === correctAnswer) {
       setFeedback('正解！')
+      setShowImage(true)
     } else {
       setMistakeCount(mistakeCount + 1)
       if (mistakeCount === 0) {
@@ -69,6 +74,7 @@ const Quiz = () => {
         setFeedback('不正解。')
       } else {
         setFeedback(`不正解。正解は「${correctAnswer}」でした。`)
+        setShowImage(true)
       }
     }
   }
@@ -93,8 +99,12 @@ const Quiz = () => {
         ))}
       </ul>
       <p>{feedback}</p>
-      <br /> {/* １行開ける */}
-      <button onClick={handleNextQuestion}>次の問題へ</button>
+      <br />
+      {showImage && pokemonImage && (
+        <img src={pokemonImage} alt='ポケモン画像' />
+      )}
+      <br />
+      {feedback && <button onClick={handleNextQuestion}>次の問題へ</button>}
     </div>
   )
 }
