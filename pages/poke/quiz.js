@@ -86,7 +86,7 @@ const Quiz = () => {
   return (
     <div>
       <h1>ポケモンクイズ！</h1>
-      <p>このポケモンは何でしょう？(解答は３回で答え出る)</p>
+      <p>このポケモンは何でしょう？</p>
       <p>{hints[0]}</p>
       {mistakeCount > 0 && <p>{hints[1]}</p>}
       <ul>
