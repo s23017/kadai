@@ -89,7 +89,50 @@ const Quiz = () => {
         setFeedback('不正解。')
         setHints([
           ...hints,
-          `タイプ: ${pokemonData.types.map(type => type.type.name).join(', ')}`
+          `タイプ: ${pokemonData.types
+            .map(type => {
+              switch (type.type.name) {
+                case 'grass':
+                  return 'くさ'
+                case 'water':
+                  return 'みず'
+                case 'fire':
+                  return 'ほのお'
+                case 'bug':
+                  return 'むし'
+                case 'normal':
+                  return 'ノーマル'
+                case 'electric':
+                  return 'でんき'
+                case 'ice':
+                  return 'こおり'
+                case 'fighting':
+                  return 'かくとう'
+                case 'poison':
+                  return 'どく'
+                case 'ground':
+                  return 'じめん'
+                case 'flying':
+                  return 'ひこう'
+                case 'psychic':
+                  return 'エスパー'
+                case 'rock':
+                  return 'いわ'
+                case 'ghost':
+                  return 'ゴースト'
+                case 'dragon':
+                  return 'ドラゴン'
+                case 'dark':
+                  return 'あく'
+                case 'steel':
+                  return 'はがね'
+                case 'fairy':
+                  return 'フェアリー'
+                default:
+                  return type.type.name
+              }
+            })
+            .join(', ')}`
         ])
       } else if (mistakeCount === 1) {
         setFeedback('不正解。')
