@@ -9,6 +9,7 @@ const Quiz = () => {
   const [correctAnswer, setCorrectAnswer] = useState('')
   const [hints, setHints] = useState([])
   const [mistakeCount, setMistakeCount] = useState(0)
+  const [showImage, setShowImage] = useState(false)
 
   useEffect(() => {
     fetchPokemonData()
@@ -30,6 +31,7 @@ const Quiz = () => {
       setHints([`種族値: ${getStatsString(data.stats)}`])
       setMistakeCount(0)
       setFeedback('')
+      setShowImage(false)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -60,12 +62,7 @@ const Quiz = () => {
     while (choices.length < 3) {
       const randomPokemonId = Math.floor(Math.random() * 1025) + 1
       if (randomPokemonId !== correctPokemonId) {
-        const response = await fetch(`${BASE_URL}pokemon/${randomPokemonId}`)
-        if (!response.ok) {
-          throw new Error('Failed to fetch data')
-        }
-        const data = await response.json()
-        const japaneseName = await getPokemonJapaneseName(data.species.name)
+        const japaneseName = await getPokemonJapaneseName(randomPokemonId)
         choices.push(japaneseName)
       }
     }
@@ -99,15 +96,18 @@ const Quiz = () => {
   const handleSubmit = selectedAnswer => {
     if (selectedAnswer === correctAnswer) {
       setFeedback('正解！')
+      setShowImage(true)
     } else {
       setMistakeCount(mistakeCount + 1)
       if (mistakeCount === 0) {
         setFeedback(' 正解は「' + correctAnswer + '」<<<m9(^Д^)エアプ乙www>>>')
       }
+      setShowImage(true) // 不正解でも画像を表示
     }
   }
 
   const handleNextQuestion = () => {
+    setShowImage(false) // 次の問題へボタンを押したら画像を非表示にする
     fetchPokemonData()
   }
 
@@ -124,6 +124,11 @@ const Quiz = () => {
         ))}
       </ul>
       <p>{feedback}</p>
+      {showImage && pokemonData && (
+        <div>
+          <img src={pokemonData.sprites.front_default} alt='ポケモン画像' />
+        </div>
+      )}
       <button onClick={handleNextQuestion}>次の問題へ</button>
     </div>
   )
